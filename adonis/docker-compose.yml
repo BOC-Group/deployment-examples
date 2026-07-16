@@ -1,0 +1,51 @@
+services:
+  aserver:
+    image: ${ADONIS_ASERVER_IMAGE}
+    container_name: ${ASERVER_CONTAINER_NAME:-aserver}
+    user: ado
+    ports:
+      - "${ASERVER_PORT_1:-54321}:54321"
+      - "${ASERVER_PORT_2:-54322}:54322"
+    environment:
+      ADOXX_SERVER_PORTS: ${ADOXX_SERVER_PORTS:-54321,54322}
+      ADOXX_SERVER_DBNAME: ${DB_NAME:-adodb}
+      ADOXX_SERVER_DBTYPE: ${DB_TYPE:-PostgreSQL}
+      ADOXX_SERVER_DBHOST: ${DB_HOST}
+      ADOXX_SERVER_DBPORT: ${DB_PORT:-5432}
+      ADOXX_SERVER_WEBTIERAUTH_TRUSTED_HOSTS: ${TRUSTED_HOSTS}
+      ADOXX_LOG_MODE: ${ADOXX_LOG_MODE:-MIXED}
+      ADOXX_LOG_STD_STREAM: ${ADOXX_LOG_STD_STREAM:-1}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./logs/aserver:/aserver/logs
+    shm_size: "${ASERVER_SHM_SIZE:-300mb}"
+    networks:
+      - adonis
+
+  webserver:
+    image: ${ADONIS_WEBSERVER_IMAGE}
+    container_name: ${WEBSERVER_CONTAINER_NAME:-webserver}
+    user: ado
+    restart: on-failure
+    ports:
+      - "${HTTP_PORT:-8888}:8080"
+    environment:
+      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx2048m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000}
+      AXW_PROPERTIES_aworkers: ${AXW_PROPERTIES_AWORKERS:-AS1:54321,AS1:54322}
+      AXW_PROPERTIES_aservers: ${AXW_PROPERTIES_ASERVERS:-AS1:aserver}
+      AXW_PROPERTIES_axw_logger_console_enabled: ${AXW_LOGGER_CONSOLE_ENABLED:-true}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./logs/webserver:/tomcat/logs
+    networks:
+      adonis:
+        ipv4_address: ${WEBSERVER_IP:-172.28.12.5}
+
+networks:
+  adonis:
+    name: ${ADONIS_NETWORK_NAME:-adonis}
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: ${ADONIS_SUBNET:-172.28.12.0/24}
