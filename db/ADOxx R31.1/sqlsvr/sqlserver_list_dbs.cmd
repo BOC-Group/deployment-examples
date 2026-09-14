@@ -16,7 +16,7 @@ ECHO.
 ECHO Please wait...
 ECHO.
 
-sqlcmd -U ADOxx -P r0KaQIFA]cPd2Ave -h-1 -S %1 -Q %SQL_STATEMENT_GET_DBS%
+sqlcmd -U ADOxx -P <ADOXX_PASSWORD> -h-1 -S %1 -Q %SQL_STATEMENT_GET_DBS%
 goto end
 
 :simple
@@ -25,7 +25,7 @@ ECHO Databases on the SQL Server default instance on this computer:
 ECHO.
 ECHO Please wait...
 ECHO.
-sqlcmd -U ADOxx -P r0KaQIFA]cPd2Ave -h-1 -Q %SQL_STATEMENT_GET_DBS%
+sqlcmd -U ADOxx -P <ADOXX_PASSWORD> -h-1 -Q %SQL_STATEMENT_GET_DBS%
 
 :end
 SET SQL_STATEMENT_GET_DBS=
