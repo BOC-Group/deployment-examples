@@ -28,7 +28,7 @@
   DECLARE @vADOxxPwd nvarchar(128);  -- technical ADOxx user's password
 
   SET @vADOxxName  = N'ADOxx';
-  SET @vADOxxPwd   = N'r0KaQIFA]cPd2Ave';
+  SET @vADOxxPwd   = N'<ADOXX_PASSWORD>';
 
   -- Can be adapted: data file and log file settings
   DECLARE @vDBFileInitSize nvarchar(10);    -- initial size of database data file
@@ -63,7 +63,7 @@
   DECLARE @vADOxxBootPwd nvarchar(128); -- ADOxx boot user's password
 
   SET @vADOxxBootName = 'ADOXX_BOOT';
-  SET @vADOxxBootPwd  = 'iCfCK!lHP8S1L]Ry';
+  SET @vADOxxBootPwd  = '<ADOXX_BOOT_PASSWORD>';
 
 BEGIN TRY
   PRINT N'********************************************************';
