@@ -44,7 +44,7 @@ CREATE DATABASE :vDBName;
 \echo '********************************************************';
 DO $$
 BEGIN
-  CREATE USER "ADOxx" PASSWORD 'r0KaQIFA]cPd2Ave';
+  CREATE USER "ADOxx" PASSWORD '<ADOXX_PASSWORD>';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
   RAISE NOTICE '...Login ADOxx already exists. No action taken.';
 END
@@ -52,7 +52,7 @@ $$;
 
 DO $$
 BEGIN
-  CREATE USER "ADOXX_BOOT" PASSWORD 'iCfCK!lHP8S1L]Ry';
+  CREATE USER "ADOXX_BOOT" PASSWORD '<ADOXX_BOOT_PASSWORD>';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
   RAISE NOTICE 'Login "ADOXX_BOOT" already exists. No action taken.';
 END
