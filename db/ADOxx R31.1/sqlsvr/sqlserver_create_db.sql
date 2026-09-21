@@ -58,13 +58,6 @@
   DECLARE @DropDBOnError char(1); -- controls whether or not the database should be dropped on error, handle carefully!!!
   SET @DropDBOnError = 0;
 
-  -- DO NOT CHANGE!!!
-  DECLARE @vADOxxBootName nvarchar(128); -- ADOxx boot user identifier
-  DECLARE @vADOxxBootPwd nvarchar(128); -- ADOxx boot user's password
-
-  SET @vADOxxBootName = 'ADOXX_BOOT';
-  SET @vADOxxBootPwd  = '<ADOXX_BOOT_PASSWORD>';
-
 BEGIN TRY
   PRINT N'********************************************************';
   PRINT N'*         Create empty ADOxx Database                  *';
@@ -110,29 +103,8 @@ BEGIN TRY
 
 
   PRINT N'********************************************************';
-  PRINT N'*        Create logins for the ADOxx technical users   *';
+  PRINT N'*        Create login for the ADOxx technical user   *';
   PRINT N'********************************************************';
-  BEGIN TRY
-    SET @sqltxt = N'CREATE LOGIN ' + @vADOxxBootName + N' WITH PASSWORD = ''' + @vADOxxBootPwd + N'''';
-    EXECUTE sp_executesql @sqltxt;
-  END TRY
-  BEGIN CATCH
-    IF @@ERROR = 15025
-    BEGIN
-      PRINT N'...Login ' + @vADOxxBootName + N' already exists. No action taken.';
-    END
-    ELSE
-    BEGIN
-
-      SELECT 
-        @ErrorMessage = ERROR_MESSAGE(),
-        @ErrorSeverity = ERROR_SEVERITY(),
-        @ErrorState = ERROR_STATE();
-
-      -- Re-throw exception
-      RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
-    END
-  END CATCH
 
   BEGIN TRY
   SET @sqltxt = N'CREATE LOGIN ' + @vADOxxName + N' WITH PASSWORD = ''' + @vADOxxPwd + N'''';
@@ -202,13 +174,9 @@ BEGIN TRY
   PRINT N'...Connection to the database ' + @vDBName  + N' succeeded.';
 
   PRINT N'********************************************************';
-  PRINT N'*        Create DB users for the ADOxx technical users *';
+  PRINT N'*        Create DB user for the ADOxx technical user *';
   PRINT N'********************************************************';
-  SET @sqltxt = N'USE ' + @vDBName + N';CREATE USER ' + @vADOxxBootName + N' FROM LOGIN ' + @vADOxxBootName + N' WITH DEFAULT_SCHEMA=' + @vADOxxName;
-  EXECUTE sp_executesql @sqltxt;
-
-  PRINT N'...Boot user ' + @vADOxxBootName + N' created';
-
+  
   SET @sqltxt = N'USE ' + @vDBName + N';CREATE USER ' + @vADOxxName + N' FROM LOGIN ' + @vADOxxName + N' WITH DEFAULT_SCHEMA=' + @vADOxxName;
   EXECUTE sp_executesql @sqltxt;
 
