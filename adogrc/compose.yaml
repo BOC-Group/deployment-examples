@@ -1,0 +1,69 @@
+services:
+  aserver:
+    image: ${ADOGRC_ASERVER_IMAGE:?ADOGRC_ASERVER_IMAGE must be configured}
+    user: ado
+    mem_limit: ${ASERVER_MEMORY_LIMIT:-16g}
+    cpus: ${ASERVER_CPU_LIMIT:-6}
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    stop_grace_period: 60s
+    environment:
+      ADOXX_SERVER_PORTS: ${ADOXX_SERVER_PORTS:-54321,54322}
+      ADOXX_SERVER_DBNAME: ${DB_NAME:-adodb}
+      ADOXX_SERVER_DBTYPE: ${DB_TYPE:-PostgreSQL}
+      ADOXX_SERVER_DBHOST: ${DB_HOST:?DB_HOST must be configured}
+      ADOXX_SERVER_DBPORT: ${DB_PORT:-5432}
+      ADOXX_DBMS_ENCRYPTION: ${ADOXX_DBMS_ENCRYPTION:-Optional}
+      ADOXX_DBMS_TRUST_SERVER_CERTIFICATE: ${ADOXX_DBMS_TRUST_SERVER_CERTIFICATE:-no}
+      ADOXX_SERVER_WEBTIERAUTH_TRUSTED_HOSTS: ${TRUSTED_HOSTS:?TRUSTED_HOSTS must be configured}
+      ADOXX_LOG_MODE: ${ADOXX_LOG_MODE:-MIXED}
+      ADOXX_LOG_STD_STREAM: ${ADOXX_LOG_STD_STREAM:-1}
+      ADOXX_INDEXES_DIR: /fts
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ${ASERVER_LOGS_MOUNT_PATH:-./logs/aserver}:/aserver/logs
+      - ${ASERVER_FTS_MOUNT_PATH:-./data/fts}:/fts
+    shm_size: "${ASERVER_SHM_SIZE:-300mb}"
+    networks:
+      - adogrc
+
+  webserver:
+    image: ${ADOGRC_WEBSERVER_IMAGE:?ADOGRC_WEBSERVER_IMAGE must be configured}
+    user: ado
+    mem_limit: ${WEBSERVER_MEMORY_LIMIT:-8g}
+    cpus: ${WEBSERVER_CPU_LIMIT:-4}
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    stop_grace_period: 60s
+    depends_on:
+      aserver:
+        condition: service_started
+    ports:
+      - "${HTTP_BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-8888}:8080"
+    environment:
+      JAVA_OPTS: ${JAVA_OPTS:--Xms512m -Xmx4G}
+      AXW_PROPERTIES_aworkers: ${AXW_PROPERTIES_AWORKERS:-AS1:54321,AS1:54322}
+      AXW_PROPERTIES_aservers: ${AXW_PROPERTIES_ASERVERS:-AS1:aserver}
+      AXW_PROPERTIES_application_core_job_users: GRC-Scheduler,GRC-Notification
+      AXW_PROPERTIES_axw_logger_mode: ${AXW_LOGGER_MODE:-MIXED}
+      AXW_PROPERTIES_axw_logger_console_enabled: ${AXW_LOGGER_CONSOLE_ENABLED:-false}
+      AXW_PROPERTIES_mail_max_mail_size: ${AXW_MAIL_MAX_MAIL_SIZE:-500}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ${WEBSERVER_LOGS_MOUNT_PATH:-./logs/webserver}:/tomcat/logs
+    networks:
+      adogrc:
+        ipv4_address: ${WEBSERVER_IP:-172.28.12.5}
+
+networks:
+  adogrc:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${ADOGRC_SUBNET:-172.28.12.0/24}

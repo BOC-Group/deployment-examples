@@ -4,7 +4,7 @@ This repository contains sample Docker Compose artifacts for deploying ADOGRC 15
 
 ## Files
 
-- `docker-compose.yml` - Docker Compose definition for deploying ADOGRC with an existing external database.
+- `compose.yaml` - Docker Compose definition for deploying ADOGRC with an existing external database.
 - `.env.example` - Template file for environment-specific configuration values.
 
 ## Prerequisites
