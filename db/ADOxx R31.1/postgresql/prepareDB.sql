@@ -50,26 +50,16 @@ BEGIN
 END
 $$;
 
-DO $$
-BEGIN
-  CREATE USER "ADOXX_BOOT" PASSWORD '<ADOXX_BOOT_PASSWORD>';
-  EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'Login "ADOXX_BOOT" already exists. No action taken.';
-END
-$$;
-
-\echo '...Logins for the ADOxx technical users created.';
+\echo '...Login for the ADOxx technical user created.';
 
 \echo '********************************************************';
 \echo '*    Create schema, grant access and set permissions   *';
 \echo '********************************************************';
 GRANT CONNECT ON DATABASE :vDBName TO "ADOxx";
-GRANT CONNECT ON DATABASE :vDBName TO "ADOXX_BOOT";
 
 CREATE SCHEMA IF NOT EXISTS "ADOxx";
 
 GRANT USAGE ON SCHEMA "ADOxx" TO "ADOxx";
-GRANT USAGE ON SCHEMA "ADOxx" TO "ADOXX_BOOT";
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA "ADOxx" GRANT INSERT ON TABLES TO "ADOxx";
 ALTER DEFAULT PRIVILEGES IN SCHEMA "ADOxx" GRANT SELECT ON TABLES TO "ADOxx";
