@@ -1505,5 +1505,3 @@ CREATE TRIGGER insertMiRepoobjs AFTER INSERT ON "ADOxx".mi_repoobjs
 FOR EACH ROW
 WHEN (pg_trigger_depth() < 1)
 EXECUTE PROCEDURE "ADOxx".insertMiRepoobjs();
-
-GRANT SELECT ON "ADOxx".dbinfo TO "ADOXX_BOOT";
